@@ -2,40 +2,62 @@
 
 Este proyecto es la API de backend para una aplicación de seguimiento de hábitos, desarrollada en Node.js y Express con persistencia de datos en MongoDB. Fue creado como parte de la Actividad 1 del curso de Programación Avanzada.
 
-## Requisitos Previos
+El repositorio está estructurado en dos carpetas principales:
+* **backend:** API REST desarrollada con Node.js, Express.js y MongoDB.
+* **frontend:** Interfaz de usuario desarrollada con Next.js, Tailwind CSS y Redux para la gestión del estado global.
 
-Antes de ejecutar este proyecto, asegurarse de tener instalado:
-* Node.js
-* Una cuenta en MongoDB Atlas con un cluster configurado.
+## Requisitos Previos
+* Node.js instalado en tu equipo local.
+* Una cuenta activa en MongoDB Atlas con la IP permitida (`0.0.0.0/0`).
 
 ## Instrucciones de Instalación y Ejecución
 
-Seguir estos pasos para levantar el servidor en un entorno local:
+Para correr el proyecto localmente, debes levantar ambos entornos (servidor y cliente) de forma simultánea.
 
 ### 1. Clonar el repositorio
-Si aún no se tiene el código en la máquina local, clonar el repositorio desde la rama correspondiente y entrar a la carpeta del proyecto:
-bash
-git clone <URL_DEl_REPOSITORIO>
-cd habits-tracker-backend
-git checkout semana1
+Abre tu terminal, clona el repositorio y muévete a la rama correspondiente a esta entrega:
 
-### 2. Configurar las variables de entorno
+```bash
+git clone <URL_DE_TU_REPOSITORIO>
+cd <nombre-de-tu-carpeta-principal>
+git checkout semana2
+```
 
-Crear un archivo llamado `.env` en la raíz del proyecto. Dentro de este archivo, colocar la cadena de conexión a MongoDB Atlas. 
+### 2. Configurar y ejecutar el Backend
+Abre una terminal, entra a la carpeta del servidor e instala sus dependencias:
 
-El archivo debe verse exactamente así, reemplazando los datos entre los símbolos `< >` con las credenciales reales:
+```bash
+cd backend
+npm install
+```
 
-env
-MONGO_URI=mongodb+srv://<tu_usuario>:<tu_contraseña_alfanumerica>@<tu_cluster>.mongodb.net/habitosApp?retryWrites=true&w=majority
+Crea un archivo `.env` dentro de la carpeta `backend` con la siguiente estructura (reemplazando los valores con tus credenciales reales):
 
+```env
+MONGO_URI=mongodb://<usuario>:<password>@<cluster-url>:27017/habitosApp?ssl=true&authSource=admin&retryWrites=true&w=majority
+PORT=3001
+```
 
-**Nota de seguridad:** Asegurarse de que la dirección IP esté permitida (`0.0.0.0/0`) en la sección *Network Access* de MongoDB Atlas para evitar errores de conexión.
+Inicia el servidor backend:
 
-### 3. Iniciar el servidor
-Una vez que el archivo `.env` esté listo, iniciar la aplicación ejecutando:
-
-bash
+```bash
 npm start
+```
+*(La consola te indicará que la base de datos está conectada en el puerto 3001).*
 
+### 3. Configurar y ejecutar el Frontend
+Abre una **nueva** terminal (sin cerrar la del backend), entra a la carpeta de la interfaz e instala sus dependencias:
 
-Si la configuración es correcta, la consola mostrará un mensaje indicando que el servidor está corriendo y que la base de datos está conectada.
+```bash
+cd frontend
+npm install
+```
+
+Inicia el servidor de desarrollo de Next.js:
+
+```bash
+npm run dev
+```
+
+### 4. Uso de la aplicación
+Una vez que ambos servidores estén corriendo, abre tu navegador web e ingresa a `http://localhost:3000`. La aplicación web se conectará automáticamente al backend para obtener y mostrar tu lista de hábitos usando Redux.

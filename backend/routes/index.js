@@ -32,4 +32,12 @@ router.delete('/habits/:id', async (req, res) => {
     res.status(500).json({ message: 'Habit not found' });
   } 
 });
+router.get('/', async (req, res) => {
+    try {
+        const habits = await Habit.find();
+        res.status(200).json(habits);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener los hábitos' });
+    }
+});
 module.exports = router;
