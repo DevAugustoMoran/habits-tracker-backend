@@ -18,24 +18,41 @@ interface RootState {
 
 export default function Home() {
   const dispatch = useDispatch();
-  
-  // Integración lista dinámica según la lista de hábitos de redux
   const { habits } = useSelector((state: RootState) => state.habits);
 
-  useEffect(() => {
-    const fetchHabits = async () => {
-      try {
-        const response = await fetch('http://localhost:3001/api/habits'); 
-        const data = await response.json();
-        
-        dispatch(setHabits(data));
-      } catch (error) {
-        console.error("Error al obtener los hábitos:", error);
-      }
-    };
+  const fetchHabits = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/habits'); 
+      const data = await response.json();
+      dispatch(setHabits(data));
+    } catch (error) {
+      console.error("Error al obtener los hábitos:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchHabits();
   }, [dispatch]);
+
+  const handleComplete = async (id: string) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/habits/${id}/complete`, {
+        method: 'PUT',
+      });
+      
+      if (response.ok) {
+        fetchHabits();
+      }
+    } catch (error) {
+      console.error("Error al completar el hábito:", error);
+    }
+  };
+
+  const getProgressBarColor = (days: number) => {
+    if (days < 22) return 'bg-red-500';      
+    if (days < 44) return 'bg-yellow-400';   
+    return 'bg-green-500';                
+  };
 
   return (
     <main className="p-8 font-sans bg-gray-50 min-h-screen">
@@ -47,7 +64,11 @@ export default function Home() {
             <p className="text-gray-500">No hay hábitos registrados aún.</p>
           ) : (
             <ul className="space-y-6">
-              {habits.map((habit: HabitType) => (
+              {habits.map((habit: HabitType) => {
+                
+                const progressPercentage = Math.min((habit.completedDays / 66) * 100, 100);
+                
+                return (
                 <li key={habit._id} className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
                   
                   <div className="flex justify-between items-center mb-4">
@@ -58,26 +79,27 @@ export default function Home() {
                       </p>
                     </div>
                     
-                    {/* Integración boton de "Done" (no debe funcionar por ahora) */}
+                    {}
                     <button 
-                      className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full shadow transition-colors cursor-default"
+                      onClick={() => handleComplete(habit._id)}
+                      className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full shadow transition-colors active:scale-95"
                       type="button"
                     >
                       Done
                     </button>
                   </div>
                   
-                  {/* Integración barra de progreso (no debe ser dinámica por ahora) */}
+                  {}
                   <div className="w-full bg-gray-200 rounded-full h-3 mb-1 overflow-hidden">
                     <div 
-                      className="bg-red-400 h-3 rounded-full" 
-                      style={{ width: '15%' }} 
+                      className={`h-3 rounded-full transition-all duration-500 ${getProgressBarColor(habit.completedDays)}`} 
+                      style={{ width: `${progressPercentage}%` }} 
                     ></div>
                   </div>
                   <p className="text-xs text-right text-gray-400 mt-1">La meta son 66 días</p>
                   
                 </li>
-              ))}
+              )})}
             </ul>
           )}
         </div>

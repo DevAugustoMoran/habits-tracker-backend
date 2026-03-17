@@ -1,17 +1,21 @@
 const mongoose = require('mongoose');
+
 const habitSchema = new mongoose.Schema({
-    title:  {
+    name: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
-    description:{
-        type: String,
-        required: true
+    completedDays: {
+        type: Number,
+        default: 0
     },
-    createdAt:{
+    lastCompletedDate: {
         type: Date,
-        default: Date.now
+        default: null
     }
+}, { 
+    timestamps: true 
 });
 
 module.exports = mongoose.model('Habit', habitSchema);
