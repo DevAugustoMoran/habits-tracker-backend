@@ -1,9 +1,39 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+export interface HabitType {
+  _id: string;
+  name: string;
+  completedDays: number;
+}
+
+const getToken = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('token');
+  }
+  return null;
+};
+
 export const fetchHabitsAsync = createAsyncThunk(
   'habits/fetchHabits',
   async () => {
-    const response = await fetch('http://localhost:3001/api/habits');
+    const response = await fetch('http://localhost:3001/api/habits', {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    return await response.json();
+  }
+);
+
+export const addHabitAsync = createAsyncThunk(
+  'habits/addHabit',
+  async (name: string) => {
+    const response = await fetch('http://localhost:3001/api/habits', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}` 
+      },
+      body: JSON.stringify({ name })
+    });
     return await response.json();
   }
 );
@@ -13,6 +43,7 @@ export const completeHabitAsync = createAsyncThunk(
   async (id: string) => {
     const response = await fetch(`http://localhost:3001/api/habits/${id}/complete`, {
       method: 'PUT',
+      headers: { 'Authorization': `Bearer ${getToken()}` }
     });
     return await response.json();
   }
@@ -23,12 +54,14 @@ const habitSlice = createSlice({
   initialState: {
     habits: [] as HabitType[],
   },
-  reducers: {
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchHabitsAsync.fulfilled, (state, action) => {
-        state.habits = action.payload;
+        state.habits = action.payload; 
+      })
+      .addCase(addHabitAsync.fulfilled, (state, action) => {
+        state.habits.push(action.payload);
       })
       .addCase(completeHabitAsync.fulfilled, (state, action) => {
         const updatedHabit = action.payload;
@@ -40,9 +73,4 @@ const habitSlice = createSlice({
   },
 });
 
-export interface HabitType {
-  _id: string;
-  name: string;
-  completedDays: number;
-}
 export default habitSlice.reducer;

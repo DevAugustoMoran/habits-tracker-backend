@@ -1,8 +1,10 @@
-'use client'; 
+'use client';
+import { AppDispatch } from '../store/store';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchHabitsAsync, completeHabitAsync } from '../store/slices/habitSlice';
+import { useRouter } from 'next/navigation';
+import { fetchHabitsAsync, completeHabitAsync, addHabitAsync } from '../store/slices/habitSlice';
 
 interface HabitType {
   _id: string;
@@ -17,17 +19,36 @@ interface RootState {
 }
 
 export default function Home() {
-  const dispatch = useDispatch(); 
+  const dispatch = useDispatch<AppDispatch>(); 
   const { habits } = useSelector((state: RootState) => state.habits);
+  const router = useRouter();
+  
+  const [newHabitName, setNewHabitName] = useState('');
 
   useEffect(() => {
-    // @ts-expect-error- ignorando error de thunk
-    dispatch(fetchHabitsAsync());
-  }, [dispatch]);
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+    } else {
+      dispatch(fetchHabitsAsync());
+    }
+  }, [dispatch, router]);
 
   const handleComplete = (id: string) => {
-    // @ts-expect-error- ignorando error de thunk
     dispatch(completeHabitAsync(id));
+  };
+
+  const handleAddHabit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newHabitName.trim() === '') return;
+    
+    dispatch(addHabitAsync(newHabitName));
+    setNewHabitName('');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    router.push('/login');
   };
 
   const getProgressBarColor = (days: number) => {
@@ -36,17 +57,44 @@ export default function Home() {
     return 'bg-green-500';
   };
 
+  const safeHabits = Array.isArray(habits) ? habits : [];
+
   return (
     <main className="p-8 font-sans bg-gray-50 min-h-screen">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-blue-600">Mis Hábitos Atómicos</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-blue-600">Mis Hábitos Atómicos</h1>
+          <button 
+            onClick={handleLogout}
+            className="text-sm bg-red-100 text-red-600 font-semibold py-2 px-4 rounded hover:bg-red-200 transition-colors"
+          >
+            Cerrar Sesión
+          </button>
+        </div>
+
+        {}
+        <form onSubmit={handleAddHabit} className="mb-8 flex gap-4">
+          <input 
+            type="text" 
+            placeholder="Ej. Leer 10 páginas, Tomar agua..." 
+            className="flex-1 border border-gray-300 rounded-lg p-3 text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={newHabitName}
+            onChange={(e) => setNewHabitName(e.target.value)}
+          />
+          <button 
+            type="submit" 
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+          >
+            Agregar Hábito
+          </button>
+        </form>
         
         <div className="bg-white shadow-md rounded-lg p-6 text-black">
-          {habits.length === 0 ? (
-            <p className="text-gray-500">No hay hábitos registrados aún.</p>
+          {safeHabits.length === 0 ? (
+            <p className="text-gray-500">No hay hábitos registrados aún. ¡Crea el primero arriba!</p>
           ) : (
             <ul className="space-y-6">
-              {habits.map((habit: HabitType) => {
+              {safeHabits.map((habit: HabitType) => {
                 const progressPercentage = Math.min((habit.completedDays / 66) * 100, 100);
                 
                 return (

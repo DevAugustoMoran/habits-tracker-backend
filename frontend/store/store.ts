@@ -6,3 +6,5 @@ export const store = configureStore({
     habits: habitReducer
   }
 });
+
+export type AppDispatch = typeof store.dispatch;

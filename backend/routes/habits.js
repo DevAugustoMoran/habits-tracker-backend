@@ -1,20 +1,35 @@
 const express = require('express');
 const router = express.Router();
+const Habit = require('../models/Habit');
+const auth = require('../middleware/auth'); 
 
-const Habit = require('../models/Habit'); 
+router.use(auth);
 
 router.get('/', async (req, res) => {
     try {
-        const habits = await Habit.find(); 
-        res.status(200).json(habits); 
+        const habits = await Habit.find({ userId: req.user._id });
+        res.status(200).json(habits);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener los hábitos' });
     }
 });
 
+router.post('/', async (req, res) => {
+    try {
+        const newHabit = new Habit({
+            name: req.body.name,
+            userId: req.user._id 
+        });
+        const savedHabit = await newHabit.save();
+        res.status(201).json(savedHabit);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al crear el hábito' });
+    }
+});
+
 router.put('/:id/complete', async (req, res) => {
     try {
-        const habit = await Habit.findById(req.params.id);
+        const habit = await Habit.findOne({ _id: req.params.id, userId: req.user._id });
         if (!habit) return res.status(404).json({ error: 'Hábito no encontrado' });
 
         const today = new Date();
@@ -44,7 +59,6 @@ router.put('/:id/complete', async (req, res) => {
 
         res.status(200).json(updatedHabit);
     } catch (error) {
-        console.log("EL ERROR EXACTO ES:", error);
         res.status(500).json({ error: 'Error al actualizar el hábito' });
     }
 });
