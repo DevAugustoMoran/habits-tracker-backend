@@ -6,6 +6,8 @@ export interface HabitType {
   completedDays: number;
 }
 
+const API_URL = 'https://habits-tracker-backend-7c6u-8cip73658-devaugustomorans-projects.vercel.app';
+
 const getToken = () => {
   if (typeof window !== 'undefined') {
     return localStorage.getItem('token');
@@ -16,7 +18,7 @@ const getToken = () => {
 export const fetchHabitsAsync = createAsyncThunk(
   'habits/fetchHabits',
   async () => {
-    const response = await fetch('https://habits-tracker-backend-7c6u-8cip73658-devaugustomorans-projects.vercel.app/', {
+    const response = await fetch(`${API_URL}/api/habits`, {
       headers: { 'Authorization': `Bearer ${getToken()}` }
     });
     return await response.json();
@@ -26,7 +28,7 @@ export const fetchHabitsAsync = createAsyncThunk(
 export const addHabitAsync = createAsyncThunk(
   'habits/addHabit',
   async (name: string) => {
-    const response = await fetch('https://habits-tracker-backend-7c6u-8cip73658-devaugustomorans-projects.vercel.app/', {
+    const response = await fetch(`${API_URL}/api/habits`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
@@ -41,7 +43,7 @@ export const addHabitAsync = createAsyncThunk(
 export const completeHabitAsync = createAsyncThunk(
   'habits/completeHabit',
   async (id: string) => {
-    const response = await fetch(`https://habits-tracker-backend-7c6u-8cip73658-devaugustomorans-projects.vercel.app/`, {
+    const response = await fetch(`${API_URL}/api/habits/${id}/complete`, {
       method: 'PUT',
       headers: { 'Authorization': `Bearer ${getToken()}` }
     });
