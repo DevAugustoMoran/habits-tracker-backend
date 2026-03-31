@@ -6,7 +6,7 @@ export interface HabitType {
   completedDays: number;
 }
 
-const API_URL = 'https://habits-tracker-backend-7c6u-8cip73658-devaugustomorans-projects.vercel.app';
+const API_URL = 'https://habits-tracker-backend-7c6u.vercel.app';
 
 const getToken = () => {
   if (typeof window !== 'undefined') {
