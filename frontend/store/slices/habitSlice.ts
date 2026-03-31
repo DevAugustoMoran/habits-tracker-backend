@@ -16,7 +16,7 @@ const getToken = () => {
 export const fetchHabitsAsync = createAsyncThunk(
   'habits/fetchHabits',
   async () => {
-    const response = await fetch('http://localhost:3001/api/habits', {
+    const response = await fetch('https://habits-tracker-backend-7c6u-8cip73658-devaugustomorans-projects.vercel.app/', {
       headers: { 'Authorization': `Bearer ${getToken()}` }
     });
     return await response.json();
@@ -26,7 +26,7 @@ export const fetchHabitsAsync = createAsyncThunk(
 export const addHabitAsync = createAsyncThunk(
   'habits/addHabit',
   async (name: string) => {
-    const response = await fetch('http://localhost:3001/api/habits', {
+    const response = await fetch('https://habits-tracker-backend-7c6u-8cip73658-devaugustomorans-projects.vercel.app/', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ export const addHabitAsync = createAsyncThunk(
 export const completeHabitAsync = createAsyncThunk(
   'habits/completeHabit',
   async (id: string) => {
-    const response = await fetch(`http://localhost:3001/api/habits/${id}/complete`, {
+    const response = await fetch(`https://habits-tracker-backend-7c6u-8cip73658-devaugustomorans-projects.vercel.app/`, {
       method: 'PUT',
       headers: { 'Authorization': `Bearer ${getToken()}` }
     });
